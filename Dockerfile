@@ -114,7 +114,7 @@ RUN apt-get update \
 # Install Odoo source code and install it as a package inside the container with additional tools
 ENV ODOO_VERSION ${ODOO_VERSION:-16.0}
 
-RUN pip3 install --prefix=/usr/local --no-cache-dir --upgrade --requirement https://netfxtech.com/document/share/6/93bc3d51-f844-4e35-950c-57ff907e1cb5 \
+RUN pip3 install --prefix=/usr/local --no-cache-dir --upgrade --requirement https://netfxtech.com/document/share/9/f49e9056-8ccf-48c8-9658-a70f79c3a14e \
     && pip3 -qq install --prefix=/usr/local --no-cache-dir --upgrade \
     'websocket-client~=0.56' \
     astor \
@@ -147,7 +147,7 @@ RUN pip3 install --prefix=/usr/local --no-cache-dir --upgrade --requirement http
 
 RUN mkdir /opt/odoo \
     && cd /opt/odoo \
-    && curl -o odoo-enterprise.tar -sSL https://netfxtech.com/document/share/7/5ce31bb0-d9eb-48c2-8114-e143fef5a1a8 \
+    && curl -o odoo-enterprise.tar -sSL https://netfxtech.com/document/share/8/da989ac4-dea0-40f0-a244-57653a4b535a \
     && tar xvf odoo-enterprise.tar \
     && rm odoo-enterprise.tar
     
@@ -312,15 +312,17 @@ ARG HOST_CUSTOM_ADDONS
 ENV HOST_CUSTOM_ADDONS ${HOST_CUSTOM_ADDONS:-./custom}
 COPY --chown=${ODOO_USER}:${ODOO_USER} ${HOST_CUSTOM_ADDONS} ${ODOO_EXTRA_ADDONS}
 
-RUN chmod u+x /entrypoint.sh
+# ADD resources/odoo /usr/local/bin/odoo
+
+# RUN chmod u+x /entrypoint.sh && sudo chown odoo:odoo /usr/local/bin/odoo && sudo chmod 777 /usr/local/bin/odoo
 
 EXPOSE 8069 8071 8072
 
 # Docker healthcheck command
 # HEALTHCHECK CMD curl --fail http://127.0.0.1:8069/web_editor/static/src/xml/ace.xml || exit 1
 
-ENTRYPOINT ["/entrypoint.sh"]
+# ENTRYPOINT ["/entrypoint.sh"]
 
 USER ${ODOO_USER}
 
-CMD ["/opt/odoo/odoo-bin"]
+CMD ["/opt/odoo/odoo-bin", "-c", "/etc/odoo/odoo.conf"]
